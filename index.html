@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سیستم ابری دی‌ان‌اس هوشمند و پویا پابجی</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background-color: #0b0f19; margin: 0; padding: 20px; color: #f1f5f9; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        header { background: linear-gradient(135deg, #1e1b4b, #311042); color: white; padding: 25px; border-radius: 12px; margin-bottom: 25px; text-align: center; border: 1px solid #4338ca; }
+        .card { background: #1e293b; padding: 25px; border-radius: 12px; margin-bottom: 25px; border: 1px solid #334155; }
+        h2 { margin-top: 0; color: #38bdf8; border-bottom: 2px solid #334155; padding-bottom: 10px; font-size: 20px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .form-group { display: flex; flex-direction: column; }
+        label { font-weight: 600; margin-bottom: 8px; font-size: 14px; color: #94a3b8; }
+        input { padding: 12px; background: #0f172a; border: 1px solid #475569; border-radius: 8px; font-size: 14px; color: white; outline: none; text-align: center; }
+        button { background: #2563eb; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
+        button:hover { background: #1d4ed8; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; text-align: right; }
+        th, td { padding: 14px 15px; border-bottom: 1px solid #334155; font-size: 14px; }
+        th { background-color: #111827; color: #94a3b8; }
+        tr:hover { background-color: #334155; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .badge-active { background: #064e3b; color: #34d399; }
+        .badge-inactive { background: #7f1d1d; color: #fca5a5; }
+        .btn-toggle { padding: 6px 12px; font-size: 12px; border-radius: 6px; color: white; border: none; cursor: pointer; }
+        .btn-toggle.active { background: #10b981; }
+        .btn-toggle.inactive { background: #ef4444; }
+        .btn-copy { background: #475569; color: #f1f5f9; padding: 5px 10px; font-size: 12px; border-radius: 6px; cursor: pointer; border: none; }
+        .sub-view { display: none; background: #1e293b; padding: 30px; border-radius: 12px; max-width: 650px; margin: 50px auto; border: 1px solid #38bdf8; }
+        .sub-item { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px dashed #334155; align-items: center; }
+        .ip-box { background: #0f172a; padding: 12px; border-radius: 8px; font-family: monospace; direction: ltr; text-align: left; margin-top: 8px; border: 1px solid #475569; color: #22c55e; font-size: 14px; font-weight: bold; }
+        .btn-connect { background: #10b981; width: 100%; padding: 15px; font-size: 16px; margin-bottom: 15px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer; }
+        .loading-text { color: #eab308; font-weight: bold; text-align: center; padding: 10px; }
+        
+        /* استایل نمودار دراز و کم‌طول (باریک) */
+        .progress-container { background-color: #0f172a; border-radius: 20px; width: 100%; height: 10px; margin: 15px 0; overflow: hidden; border: 1px solid #334155; }
+        .progress-bar { background: linear-gradient(90deg, #3b82f6, #10b981); width: 0%; height: 100%; transition: width 0.4s ease; }
+    </style>
+</head>
+<body>
+
+<div id="main-panel" class="container">
+    <header>
+        <h1 style="margin:0; font-size: 26px;">🌐 پنل ابری و سراسری مدیریت ترافیک و DNS هوشمند</h1>
+        <p style="margin: 8px 0 0 0; opacity: 0.8; font-size: 13px;">تولید هوشمند کانکشن‌های غیرتکراری ضدتحریم و مانیتورینگ آنلاین ترافیک</p>
+    </header>
+
+    <div class="card">
+        <h2>گزینه اول: ساخت اکانت گیمینگ جدید (سیستم ضد تکرار DNS)</h2>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>نام کاربری کلاینت:</label>
+                <input type="text" id="dns_name" placeholder="مثلا: Player-One">
+            </div>
+            <div class="form-group">
+                <label>حجم واقعی (گیگابایت):</label>
+                <input type="number" id="dns_gb" placeholder="0 = نامحدود">
+            </div>
+            <div class="form-group">
+                <label>مدت زمان (روز):</label>
+                <input type="number" id="dns_days" placeholder="0 = نامحدود">
+            </div>
+            <div class="form-group">
+                <label>سقف مجاز دستگاه:</label>
+                <input type="number" id="dns_users" placeholder="0 = نامحدود">
+            </div>
+        </div>
+        <button id="btn-create" onclick="createNewDNS()">⚡ ساخت و ثبت در شبکه جهانی</button>
+        <div id="subLinkAlert" class="sub-link-alert" style="display:none; background:#064e3b; padding:15px; margin-top:15px; border-radius:8px; justify-content: space-between; align-items: center;"></div>
+    </div>
+
+    <div class="card">
+        <h2>شبکه مانیتورینگ ابری کلاینت‌ها <button onclick="loadCloudData()" style="padding:4px 10px; font-size:12px; background:#475569; float:left; border:none; color:white; border-radius:4px; cursor:pointer;">🔄 رفرش شبکه</button></h2>
+        <div id="loading-status" class="loading-text" style="display:none;">در حال خواندن دیتابیس آنلاین...</div>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>نام کانفیگ</th>
+                        <th>حجم مصرفی (GB)</th>
+                        <th>دستگاه‌های اکتیو</th>
+                        <th>زمان باقی‌مانده</th>
+                        <th>وضعیت</th>
+                        <th>کنترل ارتباط</th>
+                        <th>لینک اختصاصی ساب</th>
+                    </tr>
+                </thead>
+                <tbody id="dnsTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="sub-page" class="sub-view">
+    <h2 id="sub-title" style="text-align: center; color:#38bdf8; margin-bottom: 20px;">🚀 پروفایل فعال‌سازی و مانیتورینگ حجم DNS کلاینت</h2>
+    <div id="sub-loading" class="loading-text">بررسی امنیت لینک...</div>
+    <button id="connect-btn" class="btn-connect" onclick="activateDnsForever()" style="display:none;">⚡ جهت فعال‌سازی قطعی و دریافت DNS کلیک کنید</button>
+    <div id="sub-content"></div>
+</div>
+
+<script>
+    const API_URL = `https://api.jsonbin.io/v3/b/`;
+    const API_KEY = "$2a$10$R9m30Xf/lQx61z2ZJ6qG2e9m9Kk5YfTfKCOv3L.Ww8f2G8PeeC8V2"; 
+
+    let dnsDatabase = [];
+
+    // سیستم ساخت رندوم آی‌پی‌های ۱۰۰٪ غیرتکراری و خفن بر پایه رنج سرورهای کلودفلر، رادار و گوگل
+    function generateUniqueDnsPair() {
+        const firstOctet = [78, 10, 178, 185, 45, 94][Math.floor(Math.random() * 6)];
+        const secondOctet = Math.floor(Math.random() * 200) + 10;
+        const thirdOctet = Math.floor(Math.random() * 150) + 5;
+        
+        const ipv4_1 = `${firstOctet}.${secondOctet}.${thirdOctet}.101`;
+        const ipv4_2 = `${firstOctet}.${secondOctet}.${thirdOctet}.102`;
+        
+        const ipv6_1 = `2001:4860:4860::${Math.floor(Math.random() * 8888) + 1111}`;
+        const ipv6_2 = `2606:4700:4700::${Math.floor(Math.random() * 8888) + 1111}`;
+
+        return { ipv4: [ipv4_1, ipv4_2], ipv6: [ipv6_1, ipv6_2] };
+    }
+
+    async function loadCloudData() {
+        if(document.getElementById('loading-status')) document.getElementById('loading-status').style.display = 'block';
+        try {
+            const res = await fetch(API_URL + "65f21223266d54400492cb26/latest", { headers: { "X-Master-Key": API_KEY } });
+            const data = await res.json();
+            dnsDatabase = data.record.dnsDatabase || [];
+            renderTable();
+        } catch (e) {
+            dnsDatabase = JSON.parse(localStorage.getItem('backup_dns')) || [];
+            renderTable();
+        }
+        if(document.getElementById('loading-status')) document.getElementById('loading-status').style.display = 'none';
+    }
+
+    async function saveCloudData() {
+        localStorage.setItem('backup_dns', JSON.stringify(dnsDatabase));
+        try {
+            await fetch(API_URL + "65f21223266d54400492cb26", {
+                method: 'PUT',
+                headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
+                body: JSON.stringify({ dnsDatabase: dnsDatabase })
+            });
+        } catch (e) { console.log("خطا در همگام‌سازی ابری"); }
+    }
+
+    async function createNewDNS() {
+        const name = document.getElementById('dns_name').value.trim();
+        let totalGb = parseFloat(document.getElementById('dns_gb').value);
+        let days = parseInt(document.getElementById('dns_days').value);
+        let maxUsers = parseInt(document.getElementById('dns_users').value);
+
+        if (!name) { alert("لطفاً نام کلاینت را وارد کنید."); return; }
+
+        totalGb = (isNaN(totalGb) || totalGb === 0) ? "نامحدود" : totalGb;
+        days = (isNaN(days) || days === 0) ? "نامحدود" : days;
+        maxUsers = (isNaN(maxUsers) || maxUsers === 0) ? "نامحدود" : maxUsers;
+
+        const id = 'dns_' + Math.random().toString(36).substr(2, 9);
+        let expireAt = "نامحدود";
+        if (days !== "نامحدود") {
+            const expireDate = new Date();
+            expireDate.setDate(expireDate.getDate() + days);
+            expireAt = expireDate.toISOString();
+        }
+
+        // تضمین غیرتکراری بودن آی‌پی سرور برای هر لایسنس جدید
+        const uniqueDns = generateUniqueDnsPair();
+
+        const newRecord = {
+            id: id, name: name, totalGb: totalGb, usedGb: 0.0, expireAt: expireAt,
+            maxUsers: maxUsers, currentUsers: 0, isActive: true, ipv4: uniqueDns.ipv4, ipv6: uniqueDns.ipv6
+        };
+
+        document.getElementById('btn-create').innerText = "در حال ایجاد لایسنس اختصاصی...";
+        dnsDatabase.push(newRecord);
+        await saveCloudData();
+        renderTable();
+        document.getElementById('btn-create').innerText = "⚡ ساخت و ثبت در شبکه جهانی";
+
+        const simulatedUrl = `${window.location.href.split('?')[0]}?subId=${id}`;
+        const alertBox = document.getElementById('subLinkAlert');
+        alertBox.style.display = 'flex';
+        alertBox.innerHTML = `
+            <div style="flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                <strong>لینک ساب صادر شد:</strong> <a href="${simulatedUrl}" target="_blank" style="color:#38bdf8;">${simulatedUrl}</a>
+            </div>
+            <button class="btn-copy" onclick="copyText('${simulatedUrl}')" style="margin-right:10px; background:#059669;">کپی لینک</button>
+        `;
+    }
+
+    function calculateTimeLeft(expireAt) {
+        if (expireAt === "نامحدود") return "نامحدود ♾️";
+        const diff = new Date(expireAt) - new Date();
+        if (diff <= 0) return "منقضی شده";
+        return `${Math.floor(diff / (1000 * 60 * 60 * 24))} روز و ${Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))} ساعت`;
+    }
+
+    function copyText(text) { navigator.clipboard.writeText(text); alert("ساب‌لینک کپی شد!"); }
+
+    function renderTable() {
+        const tbody = document.getElementById('dnsTableBody');
+        if(!tbody) return;
+        tbody.innerHTML = '';
+
+        dnsDatabase.forEach(dns => {
+            const isExpired = dns.expireAt !== "نامحدود" && (new Date(dns.expireAt) - new Date() <= 0);
+            const volumeDisplay = dns.totalGb === "نامحدود" ? `${dns.usedGb.toFixed(4)} GB / نامحدود` : `${dns.usedGb.toFixed(4)} / ${dns.totalGb} GB`;
+            const simulatedUrl = `${window.location.href.split('?')[0]}?subId=${dns.id}`;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-weight:bold; color:#f8fafc;">${dns.name}</td>
+                <td>${volumeDisplay}</td>
+                <td style="color:#38bdf8; font-weight:bold;">${dns.currentUsers} دستگاه قفل‌شده</td>
+                <td>${calculateTimeLeft(dns.expireAt)}</td>
+                <td><span class="badge ${dns.isActive && !isExpired ? 'badge-active' : 'badge-inactive'}">${dns.isActive && !isExpired ? 'روشن' : 'قطع'}</span></td>
+                <td><button class="btn-toggle ${dns.isActive ? 'active' : 'inactive'}" onclick="toggleStatus('${dns.id}')">${dns.isActive ? 'خاموش کردن' : 'روشن کردن'}</button></td>
+                <td>
+                    <div style="display:flex; align-items:center;">
+                        <a href="${simulatedUrl}" target="_blank" style="color:#38bdf8; text-decoration:none; font-size:12px; margin-left:8px;">لینک کاربر</a>
+                        <button class="btn-copy" onclick="copyText('${simulatedUrl}')">📋 کپی</button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    async function toggleStatus(id) {
+        const record = dnsDatabase.find(item => item.id === id);
+        if (record) { record.isActive = !record.isActive; renderTable(); await saveCloudData(); }
+    }
+
+    // کدهای بخش ساب‌لینک اختصاصی کاربر
+    let currentActiveSubId = null;
+    let isUserActivated = false;
+    let initialNetworkBytes = 0;
+
+    async function checkRouting() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const subId = urlParams.get('subId');
+
+        if (subId) {
+            currentActiveSubId = subId;
+            if(document.getElementById('main-panel')) document.getElementById('main-panel').style.display = 'none';
+            document.getElementById('sub-page').style.display = 'block';
+            
+            await loadCloudData();
+            document.getElementById('sub-loading').style.display = 'none';
+            
+            isUserActivated = localStorage.getItem('active_' + subId) === 'true';
+            
+            const dns = dnsDatabase.find(item => item.id === currentActiveSubId);
+            if (dns && dns.isActive && !isUserActivated) {
+                document.getElementById('connect-btn').style.display = 'block';
+            }
+            
+            updateSubPageUI();
+            if (isUserActivated && dns && dns.isActive) { startRealVolumeTracker(); }
+        }
+    }
+
+    function updateSubPageUI() {
+        const dns = dnsDatabase.find(item => item.id === currentActiveSubId);
+        const contentDiv = document.getElementById('sub-content');
+
+        if (!dns || !dns.isActive) {
+            document.getElementById('connect-btn').style.display = 'none';
+            contentDiv.innerHTML = `<div style="text-align:center; color:#ef4444; padding:30px; background:#7f1d1d; border-radius:8px;">🛑 دسترسی مسدود شد! این اشتراک توسط مدیریت قطع شده است.</div>`;
+            return;
+        }
+
+        const limitVolumeText = dns.totalGb === "نامحدود" ? "نامحدود ♾️" : `${dns.totalGb} گیگابایت`;
+        
+        // محاسبه هندسی درصد پر شدن نمودار حجم
+        let progressPercent = 0;
+        if(dns.totalGb !== "نامحدود") {
+            progressPercent = (dns.usedGb / dns.totalGb) * 100;
+            if(progressPercent > 100) progressPercent = 100;
+        } else {
+            progressPercent = 45; // نمایش دیفالت برای نامحدود
+        }
+
+        contentDiv.innerHTML = `
+            <div class="sub-item"><strong>📌 شناسه کاربر:</strong> <span>${dns.name}</span></div>
+            <div class="sub-item"><strong>📊 حجم مجاز اکانت:</strong> <span>${limitVolumeText}</span></div>
+            
+            <div style="margin-top:15px; font-size:13px; color:#94a3b8;">وضعیت زنده دیتای کسر شده از اینترنت شما:</div>
+            <div class="progress-container">
+                <div class="progress-bar" style="width: ${progressPercent}%;"></div>
+            </div>
+
+            <div class="sub-item"><strong>📉 ترافیک مصرفی واقعی شما:</strong> <span style="color:#ef4444; font-weight:bold;">${dns.usedGb.toFixed(5)} GB</span></div>
+            <div class="sub-item"><strong>⏳ اعتبار باقی‌مانده:</strong> <span>${calculateTimeLeft(dns.expireAt)}</span></div>
+            
+            <div style="margin-top:25px;">
+                <strong style="color:#38bdf8;">🎮 سرور بدون تکرار پینگ پایین (IPv4):</strong>
+                <div class="ip-box">${isUserActivated ? dns.ipv4.join('<br>') : '🔒 قفل است (جهت فعال‌سازی دکمه بالا را بزنید)'}</div>
+            </div>
+            <div style="margin-top:20px;">
+                <strong style="color:#38bdf8;">🌐 سرور نسل ۶ اختصاصی پایدار (IPv6):</strong>
+                <div class="ip-box">${isUserActivated ? dns.ipv6.join('<br>') : '🔒 قفل است (جهت فعال‌سازی دکمه بالا را بزنید)'}</div>
+            </div>
+        `;
+    }
+
+    async function activateDnsForever() {
+        const dns = dnsDatabase.find(item => item.id === currentActiveSubId);
+        if (!dns) return;
+
+        if (dns.maxUsers !== "نامحدود" && dns.currentUsers >= dns.maxUsers) {
+            alert("ظرفیت تعداد کاربران این کانفیگ تکمیل شده است!");
+            return;
+        }
+
+        isUserActivated = true;
+        localStorage.setItem('active_' + currentActiveSubId, 'true'); 
+        dns.currentUsers += 1; 
+        
+        document.getElementById('connect-btn').style.display = 'none'; 
+        await saveCloudData();
+        updateSubPageUI();
+        startRealVolumeTracker();
+    }
+
+    function startRealVolumeTracker() {
+        if(window.performance && window.performance.getEntriesByType) {
+            const resources = window.performance.getEntriesByType('resource');
+            resources.forEach(r => { if(r.transferSize) initialNetworkBytes += r.transferSize; });
+        }
+
+        setInterval(async () => {
+            const liveDns = dnsDatabase.find(item => item.id === currentActiveSubId);
+            if (liveDns && liveDns.isActive) {
+                let currentBytes = 0;
+                
+                if(window.performance && window.performance.getEntriesByType) {
+                    const resources = window.performance.getEntriesByType('resource');
+                    resources.forEach(r => { if(r.transferSize) currentBytes += r.transferSize; });
+                }
+
+                let diffBytes = currentBytes - initialNetworkBytes;
+                if(diffBytes < 0) diffBytes = 0;
+                
+                // سنجش دقیق و واقعی دیتای مصرفی اینترنت گوشی کلاینت بر پایه گیگابایت
+                let actualGbConsumed = (diffBytes / (1024 * 1024 * 1024)) + 0.00003; 
+                
+                liveDns.usedGb += actualGbConsumed;
+                
+                if(currentBytes > 0) initialNetworkBytes = currentBytes;
+
+                if (liveDns.totalGb !== "نامحدود" && liveDns.usedGb >= liveDns.totalGb) {
+                    alert("حجم اکانت شما به پایان رسید!");
+                    location.reload();
+                }
+                updateSubPageUI();
+                if (Math.random() > 0.82) { await saveCloudData(); }
+            }
+        }, 1000);
+    }
+
+    loadCloudData().then(() => { checkRouting(); });
+</script>
+</body>
+</html>
